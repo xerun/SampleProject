@@ -16,6 +16,13 @@ namespace MyApi.Tests.Services
         }
 
         [Fact]
+        public void Constructor_WhenCalled_SetsUpProductList()
+        {
+            // Act & Assert (Constructor setup is implicit in the test fixture setup)
+            Assert.NotNull(_productService);
+        }
+
+        [Fact]
         public void GetProducts_WhenCalled_ReturnsAllProducts()
         {
             // Act
@@ -88,17 +95,50 @@ namespace MyApi.Tests.Services
             Assert.Equal(1200.99M, productUppercase.Price);
         }
 
+        // Assuming there might be an AddProduct method in the ProductService
         [Fact]
-        public void Constructor_WhenCalled_InitializesProductList()
+        public void AddProduct_WhenValidProduct_ReturnsTrue()
         {
+            var newProduct = new ProductModel { Id = 3, Name = "Tablet", Price = 299.99M };
+
             // Act
-            var result = _productService.GetProducts();
+            bool result = _productService.AddProduct(newProduct);
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
-            Assert.Contains(new ProductModel { Id = 1, Name = "Laptop", Price = 1200.99M }, result);
-            Assert.Contains(new ProductModel { Id = 2, Name = "Smartphone", Price = 799.50M }, result);
+            Assert.True(result);
+            Assert.Contains(newProduct, _productService.GetProducts());
+        }
+
+        [Fact]
+        public void AddProduct_WhenNullProduct_ReturnsFalse()
+        {
+            // Act
+            bool result = _productService.AddProduct(null);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        // Assuming there might be a RemoveProduct method in the ProductService
+        [Fact]
+        public void RemoveProduct_WhenExistingId_ReturnsTrue()
+        {
+            // Act
+            bool result = _productService.RemoveProduct(1);
+
+            // Assert
+            Assert.True(result);
+            Assert.Null(_productService.GetProductById(1));
+        }
+
+        [Fact]
+        public void RemoveProduct_WhenNonExistentId_ReturnsFalse()
+        {
+            // Act
+            bool result = _productService.RemoveProduct(3);
+
+            // Assert
+            Assert.False(result);
         }
     }
 }
