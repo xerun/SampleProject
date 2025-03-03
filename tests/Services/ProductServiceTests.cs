@@ -16,6 +16,19 @@ namespace MyApi.Tests.Services
         }
 
         [Fact]
+        public void Constructor_WhenCalled_InitializesProductList()
+        {
+            // Act
+            var result = _productService.GetProducts();
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(2, result.Count());
+            Assert.Contains(new ProductModel { Id = 1, Name = "Laptop", Price = 1200.99M }, result);
+            Assert.Contains(new ProductModel { Id = 2, Name = "Smartphone", Price = 799.50M }, result);
+        }
+
+        [Fact]
         public void GetProducts_WhenCalled_ReturnsAllProducts()
         {
             // Act
@@ -51,16 +64,37 @@ namespace MyApi.Tests.Services
         }
 
         [Fact]
-        public void Constructor_WhenCalled_InitializesProductList()
+        public void GetProductByName_WhenNameExists_ReturnsCorrectProduct()
         {
             // Act
-            var result = _productService.GetProducts();
+            var product = _productService.GetProductByName("Laptop");
 
             // Assert
-            Assert.NotNull(result);
-            Assert.Equal(2, result.Count());
-            Assert.Contains(new ProductModel { Id = 1, Name = "Laptop", Price = 1200.99M }, result);
-            Assert.Contains(new ProductModel { Id = 2, Name = "Smartphone", Price = 799.50M }, result);
+            Assert.NotNull(product);
+            Assert.Equal(1, product.Id);
+            Assert.Equal(1200.99M, product.Price);
+        }
+
+        [Fact]
+        public void GetProductByName_WhenNameDoesNotExist_ReturnsNull()
+        {
+            // Act
+            var product = _productService.GetProductByName("Tablet");
+
+            // Assert
+            Assert.Null(product);
+        }
+
+        [Fact]
+        public void GetProductByName_WhenNameExistsButCaseDifferent_ReturnsCorrectProduct()
+        {
+            // Act
+            var product = _productService.GetProductByName("lAPTOP");
+
+            // Assert
+            Assert.NotNull(product);
+            Assert.Equal(1, product.Id);
+            Assert.Equal(1200.99M, product.Price);
         }
     }
 }
