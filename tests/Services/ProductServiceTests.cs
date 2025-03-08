@@ -96,5 +96,53 @@ namespace MyApi.Tests.Services
             Assert.Equal(1, product.Id);
             Assert.Equal(1200.99M, product.Price);
         }
+
+        [Fact]
+        public void AddProduct_WhenProductIsNull_DoesNotAddProduct()
+        {
+            // Arrange
+            var initialCount = _productService.GetProducts().Count();
+
+            // Act
+            _productService.AddProduct(null);
+
+            // Assert
+            var finalCount = _productService.GetProducts().Count();
+            Assert.Equal(initialCount, finalCount);
+        }
+
+        [Fact]
+        public void AddProduct_WhenProductIdAlreadyExists_DoesNotAddProduct()
+        {
+            // Arrange
+            var initialCount = _productService.GetProducts().Count();
+            var existingProduct = new ProductModel { Id = 1, Name = "Existing Laptop", Price = 999.99M };
+
+            // Act
+            _productService.AddProduct(existingProduct);
+
+            // Assert
+            var finalCount = _productService.GetProducts().Count();
+            Assert.Equal(initialCount, finalCount);
+        }
+
+        [Fact]
+        public void AddProduct_WhenProductIdDoesNotExist_AddsProduct()
+        {
+            // Arrange
+            var initialCount = _productService.GetProducts().Count();
+            var newProduct = new ProductModel { Id = 3, Name = "Tablet", Price = 299.99M };
+
+            // Act
+            _productService.AddProduct(newProduct);
+
+            // Assert
+            var finalCount = _productService.GetProducts().Count();
+            Assert.Equal(initialCount + 1, finalCount);
+            var addedProduct = _productService.GetProductById(3);
+            Assert.NotNull(addedProduct);
+            Assert.Equal("Tablet", addedProduct.Name);
+            Assert.Equal(299.99M, addedProduct.Price);
+        }
     }
 }
