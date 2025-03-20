@@ -21,5 +21,10 @@ namespace MyApi.Services
         {
             return _products.FirstOrDefault(p => p.Id == id);
         }
+
+        public ProductModel? GetProductByName(string name)
+        {
+            return _products.FirstOrDefault(p => p.Name.ToLower() == name.ToLower());
+        }
     }
 }
