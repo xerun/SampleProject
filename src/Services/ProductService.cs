@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using MyApi.Models;
@@ -8,13 +9,27 @@ namespace MyApi.Services
     {
         private readonly List<ProductModel> _products = new()
         {
-            new ProductModel { Id = 1, Name = "Laptop", Price = 1200.99M },
-            new ProductModel { Id = 2, Name = "Smartphone", Price = 799.50M }
+            new ProductModel { Id = 1, Name = "Laptop", Price = 1200.99M, Category = "Electronics", InStock = true },
+            new ProductModel { Id = 2, Name = "Smartphone", Price = 799.50M, Category = "Electronics", InStock = true }
         };
 
-        public IEnumerable<ProductModel> GetProducts()
+        private int _nextId => _products.Any() ? _products.Max(p => p.Id) + 1 : 1;
+
+        public IEnumerable<ProductModel> GetProducts(string? sortBy = null, bool ascending = true)
         {
-            return _products;
+            var query = _products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                query = sortBy.ToLower() switch
+                {
+                    "name" => ascending ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name),
+                    "price" => ascending ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price),
+                    _ => query
+                };
+            }
+
+            return query.ToList();
         }
 
         public ProductModel? GetProductById(int id)
@@ -24,7 +39,43 @@ namespace MyApi.Services
 
         public ProductModel? GetProductByName(string name)
         {
-            return _products.FirstOrDefault(p => p.Name.ToLower() == name.ToLower());
+            return _products.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public IEnumerable<ProductModel> SearchProducts(string keyword)
+        {
+            return _products.Where(p =>
+                p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                p.Category?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true
+            );
+        }
+
+        public IEnumerable<ProductModel> FilterByCategory(string category)
+        {
+            return _products.Where(p => p.Category?.Equals(category, StringComparison.OrdinalIgnoreCase) == true);
+        }
+
+        public ProductModel CreateProduct(ProductModel product)
+        {
+            product.Id = _nextId;
+            _products.Add(product);
+            return product;
+        }
+
+        public bool UpdateProduct(int id, ProductModel updatedProduct)
+        {
+            var index = _products.FindIndex(p => p.Id == id);
+            if (index == -1) return false;
+
+            updatedProduct.Id = id;
+            _products[index] = updatedProduct;
+            return true;
+        }
+
+        public bool DeleteProduct(int id)
+        {
+            var product = GetProductById(id);
+            return product != null && _products.Remove(product);
         }
     }
 }
