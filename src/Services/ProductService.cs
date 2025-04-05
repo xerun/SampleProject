@@ -15,6 +15,23 @@ namespace MyApi.Services
 
         private int _nextId => _products.Any() ? _products.Max(p => p.Id) + 1 : 1;
 
+        public IEnumerable<ProductModel> GetProducts(string? sortBy = null, bool ascending = true)
+        {
+            var query = _products.AsQueryable();
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                query = sortBy.ToLower() switch
+                {
+                    "name" => ascending ? query.OrderBy(p => p.Name) : query.OrderByDescending(p => p.Name),
+                    "price" => ascending ? query.OrderBy(p => p.Price) : query.OrderByDescending(p => p.Price),
+                    _ => query
+                };
+            }
+
+            return query.ToList();
+        }
+
         public ProductModel? GetProductById(int id)
         {
             return _products.FirstOrDefault(p => p.Id == id);
