@@ -71,5 +71,11 @@ namespace MyApi.Services
             _products[index] = updatedProduct;
             return true;
         }
+
+        public bool DeleteProduct(int id)
+        {
+            var product = GetProductById(id);
+            return product != null && _products.Remove(product);
+        }
     }
 }
