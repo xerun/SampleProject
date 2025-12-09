@@ -21,5 +21,10 @@ namespace MyApi.Services
         {
             return _users.FirstOrDefault(u => u.Id == id);
         }
+
+        // public UserModel GetUserByName(string name)
+        // {
+        //     return _users.FirstOrDefault(u => u.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        // }
     }
 }

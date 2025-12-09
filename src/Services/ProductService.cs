@@ -42,6 +42,11 @@ namespace MyApi.Services
             return _products.FirstOrDefault(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
+        // public ProductModel? GetProductByPrice(decimal price)
+        // {
+        //     return _products.FirstOrDefault(p => p.Price == price);
+        // }
+
         public IEnumerable<ProductModel> SearchProducts(string keyword)
         {
             return _products.Where(p =>
@@ -70,12 +75,6 @@ namespace MyApi.Services
             updatedProduct.Id = id;
             _products[index] = updatedProduct;
             return true;
-        }
-
-        public bool DeleteProduct(int id)
-        {
-            var product = GetProductById(id);
-            return product != null && _products.Remove(product);
         }
     }
 }
